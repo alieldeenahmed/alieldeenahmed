@@ -49,9 +49,6 @@ The storefront runs on a Fastify API that prices orders on the server, can't ove
 
 ### Links
 
-- GitHub: [@alieldeenahmed](https://github.com/alieldeenahmed)
-<!-- Add as needed:
-- LinkedIn: https://www.linkedin.com/in/<your-handle>
-- Codeforces: https://codeforces.com/profile/<your-handle>
-- Email: <your-email>
--->
+- LinkedIn: https://www.linkedin.com/in/alieldeen
+- Codeforces: https://codeforces.com/profile/ali.eldeen008
+- Email: alieldeen.ah@gmail.com
