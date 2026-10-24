@@ -27,9 +27,9 @@ It handles branches, teachers, students, scheduling, billing, and payroll. The O
 
 It crawls product listings every day, stores each reading as price history, and flags discounts that don't hold up against a product's own past prices.
 
-- The API has no browser, so GitHub Actions jobs do all the scraping. Actions can deliver a job twice or not at all, so the database is the source of truth. Jobs move through a state machine (`Pending → Running → Completed | Failed`). A worker claims a job with a single conditional `UPDATE`, and every write for a product runs behind an advisory lock.
-- Submitted URLs are checked against an allow-list, and hosts are compared in punycode form to block SSRF and look-alike domains. Endpoints that consume Actions minutes are limited by rate limits and by budgets stored in the database.
-- 663 backend tests on real PostgreSQL, including concurrency tests, run in CI on every push.
+- The API has no browser, so GitHub Actions jobs do all the scraping. Actions can deliver a job twice or not at all, so the database is the source of truth. Jobs move through a state machine (`Pending → Running → Completed | Failed`). A worker claims a job with a single conditional `UPDATE`, and each price reading is recorded in one transaction behind a per-product advisory lock.
+- Submitted URLs are checked against an allow-list, with hosts compared in punycode form, so look-alike domains are rejected and the crawler's browser can't be pointed at another site. Endpoints that consume Actions minutes are limited by rate limits and by budgets stored in the database.
+- 699 backend tests: 360 use a real PostgreSQL, and 13 are explicit concurrency tests that each assert exactly one party wins. CI runs them on pushes to `main` and on pull requests.
 
 #### [Freyya](https://github.com/alieldeenahmed/Freyya): skincare storefront with an order API and admin dashboard
 `Next.js` `TypeScript` `Fastify` `PostgreSQL` `Drizzle` · [live demo (storefront only)](https://freyya.vercel.app/)
