@@ -13,31 +13,33 @@ I build backend systems in C# and ASP.NET Core on PostgreSQL. I spend most of th
 
 ### Featured projects
 
+Live demos: [Freyya](https://freyya.vercel.app/) (full stack) · [Noon-Scraper](https://noon-scraper-phi.vercel.app) (its free-tier API is sometimes down). CEMS runs locally only.
+
 #### [CEMS](https://github.com/alieldeenahmed/CEMS): management system for a multi-branch education center
 `ASP.NET Core` `EF Core` `PostgreSQL` `MediatR` `React` `TypeScript`
 
-It handles branches, teachers, students, scheduling, billing, and payroll, and staff only ever see their own branch's data.
+It handles branches, teachers, students, scheduling, billing, and payroll. The Owner sees every branch, managers and front-desk staff see only their own branch, and teachers see only what they teach.
 
-- Clean Architecture with 114 MediatR command/query handlers. Branch access is checked inside each handler, and on every request the API re-reads the account's status, roles, and branches from the database, so it doesn't rely on what the JWT claimed at login.
-- Two layers stop double-booking: advisory locks taken in a deterministic order before each conflict check, and PostgreSQL `EXCLUDE USING gist` constraints behind them. Partial unique indexes allow only one live enrollment per student per course.
-- 525 backend tests. 42 of them run against real PostgreSQL, including requests released at the same moment to prove that race conditions are actually blocked.
+- Clean Architecture with 114 MediatR command/query handlers. 71 of them check branch scope, and the rest are Owner-only, own-data or identity operations behind a role check. On every request the API re-reads the account's status, roles, and branches from the database, so it doesn't rely on what the JWT claimed at login.
+- Two layers stop double-booking: advisory locks taken in a deterministic order before each conflict check, and PostgreSQL `EXCLUDE USING gist` constraints behind them. A partial unique index allows only one live enrollment per student per course.
+- 527 backend tests. 44 of them run against real PostgreSQL, and 18 of those release requests at the same instant to prove that race conditions are actually blocked. The React frontend has another 264 tests.
 
 #### [Noon-Scraper](https://github.com/alieldeenahmed/Noon-Scraper): price tracking and discount analysis for noon.com
 `ASP.NET Core` `PostgreSQL` `Playwright` `GitHub Actions` · [live demo](https://noon-scraper-phi.vercel.app)
 
 It crawls product listings every day, stores each reading as price history, and flags discounts that don't hold up against a product's own past prices.
 
-- The API has no browser, so GitHub Actions jobs do all the scraping. Actions can deliver a job twice or not at all, so the database is the source of truth. Jobs move through a state machine (`Pending → Running → Completed | Failed`). A worker claims a job with a single conditional `UPDATE`, and every write for a product runs behind an advisory lock.
-- Submitted URLs are checked against an allow-list, and hosts are compared in punycode form to block SSRF and look-alike domains. Endpoints that consume Actions minutes are limited by rate limits and by budgets stored in the database.
-- 663 backend tests on real PostgreSQL, including concurrency tests, run in CI on every push.
+- The API has no browser, so GitHub Actions jobs do all the scraping. Actions can deliver a job twice or not at all, so the database is the source of truth. Jobs move through a state machine (`Pending → Running → Completed | Failed`). A worker claims a job with a single conditional `UPDATE`, and each price reading is recorded in one transaction behind a per-product advisory lock.
+- Submitted URLs are checked against an allow-list, with hosts compared in punycode form, so look-alike domains are rejected and the crawler's browser can't be pointed at another site. Endpoints that consume Actions minutes are limited by rate limits and by budgets stored in the database.
+- 699 backend tests: 360 use a real PostgreSQL, and 13 are explicit concurrency tests that each assert exactly one party wins. CI runs them on pushes to `main` and on pull requests.
 
 #### [Freyya](https://github.com/alieldeenahmed/Freyya): skincare storefront with an order API and admin dashboard
-`Next.js` `TypeScript` `Fastify` `PostgreSQL` `Drizzle` · [live demo (storefront only)](https://freyya.vercel.app/)
+`Next.js` `TypeScript` `Fastify` `PostgreSQL` `Drizzle` · [live demo (full stack)](https://freyya.vercel.app/), a public sandbox that resets nightly
 
 The storefront runs on a Fastify API that prices orders on the server, can't oversell stock, and handles retried requests safely.
 
-- Checkout locks stock rows in a fixed order (`SELECT … FOR UPDATE`) and holds stock for 15 minutes. An `Idempotency-Key` sent from the browser makes a retried checkout create only one order. Concurrency tests on real PostgreSQL cover cases such as ten buyers for three units, where exactly three orders succeed.
-- **Limitations:** payment is simulated. The live deployment is only the storefront, so placing orders and using the admin dashboard require a local run.
+- Checkout locks stock rows in a fixed order (`SELECT … FOR UPDATE`) and holds stock for 15 minutes. An `Idempotency-Key` sent from the browser makes a retried checkout create only one order. Concurrency tests on real PostgreSQL cover cases such as ten buyers for three units, where exactly three orders succeed, and the same race gave the same result against the deployed API.
+- **Limitations:** payment is simulated.
 
 ### Achievements
 
