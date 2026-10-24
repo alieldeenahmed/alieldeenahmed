@@ -13,6 +13,8 @@ I build backend systems in C# and ASP.NET Core on PostgreSQL. I spend most of th
 
 ### Featured projects
 
+Live demos: [Freyya](https://freyya.vercel.app/) (full stack) · [Noon-Scraper](https://noon-scraper-phi.vercel.app) (its free-tier API is sometimes down). CEMS runs locally only.
+
 #### [CEMS](https://github.com/alieldeenahmed/CEMS): management system for a multi-branch education center
 `ASP.NET Core` `EF Core` `PostgreSQL` `MediatR` `React` `TypeScript`
 
