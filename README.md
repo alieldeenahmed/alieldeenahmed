@@ -16,11 +16,11 @@ I build backend systems in C# and ASP.NET Core on PostgreSQL. I spend most of th
 #### [CEMS](https://github.com/alieldeenahmed/CEMS): management system for a multi-branch education center
 `ASP.NET Core` `EF Core` `PostgreSQL` `MediatR` `React` `TypeScript`
 
-It handles branches, teachers, students, scheduling, billing, and payroll, and staff only ever see their own branch's data.
+It handles branches, teachers, students, scheduling, billing, and payroll. The Owner sees every branch, managers and front-desk staff see only their own branch, and teachers see only what they teach.
 
-- Clean Architecture with 114 MediatR command/query handlers. Branch access is checked inside each handler, and on every request the API re-reads the account's status, roles, and branches from the database, so it doesn't rely on what the JWT claimed at login.
-- Two layers stop double-booking: advisory locks taken in a deterministic order before each conflict check, and PostgreSQL `EXCLUDE USING gist` constraints behind them. Partial unique indexes allow only one live enrollment per student per course.
-- 525 backend tests. 42 of them run against real PostgreSQL, including requests released at the same moment to prove that race conditions are actually blocked.
+- Clean Architecture with 114 MediatR command/query handlers. 71 of them check branch scope, and the rest are Owner-only, own-data or identity operations behind a role check. On every request the API re-reads the account's status, roles, and branches from the database, so it doesn't rely on what the JWT claimed at login.
+- Two layers stop double-booking: advisory locks taken in a deterministic order before each conflict check, and PostgreSQL `EXCLUDE USING gist` constraints behind them. A partial unique index allows only one live enrollment per student per course.
+- 527 backend tests. 44 of them run against real PostgreSQL, and 18 of those release requests at the same instant to prove that race conditions are actually blocked. The React frontend has another 264 tests.
 
 #### [Noon-Scraper](https://github.com/alieldeenahmed/Noon-Scraper): price tracking and discount analysis for noon.com
 `ASP.NET Core` `PostgreSQL` `Playwright` `GitHub Actions` · [live demo](https://noon-scraper-phi.vercel.app)
