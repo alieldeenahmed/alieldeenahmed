@@ -32,12 +32,12 @@ It crawls product listings every day, stores each reading as price history, and 
 - 699 backend tests: 360 use a real PostgreSQL, and 13 are explicit concurrency tests that each assert exactly one party wins. CI runs them on pushes to `main` and on pull requests.
 
 #### [Freyya](https://github.com/alieldeenahmed/Freyya): skincare storefront with an order API and admin dashboard
-`Next.js` `TypeScript` `Fastify` `PostgreSQL` `Drizzle` · [live demo (storefront only)](https://freyya.vercel.app/)
+`Next.js` `TypeScript` `Fastify` `PostgreSQL` `Drizzle` · [live demo (full stack)](https://freyya.vercel.app/), a public sandbox that resets nightly
 
 The storefront runs on a Fastify API that prices orders on the server, can't oversell stock, and handles retried requests safely.
 
-- Checkout locks stock rows in a fixed order (`SELECT … FOR UPDATE`) and holds stock for 15 minutes. An `Idempotency-Key` sent from the browser makes a retried checkout create only one order. Concurrency tests on real PostgreSQL cover cases such as ten buyers for three units, where exactly three orders succeed.
-- **Limitations:** payment is simulated. The live deployment is only the storefront, so placing orders and using the admin dashboard require a local run.
+- Checkout locks stock rows in a fixed order (`SELECT … FOR UPDATE`) and holds stock for 15 minutes. An `Idempotency-Key` sent from the browser makes a retried checkout create only one order. Concurrency tests on real PostgreSQL cover cases such as ten buyers for three units, where exactly three orders succeed, and the same race gave the same result against the deployed API.
+- **Limitations:** payment is simulated.
 
 ### Achievements
 
